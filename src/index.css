@@ -1,0 +1,507 @@
+/* ============================================================
+   Daryeel Winter Warmth — provided stylesheet (Week One)
+   A Minnesota winter night: deep navy sky, one warm amber
+   light. Plain CSS on purpose — the flexbox, grid, and
+   gradients you learned in Weeks 1–2 — so React stays the
+   focus in class. Same class names as the lesson.
+   ============================================================ */
+
+:root {
+  --night: #0b1322;        /* page background */
+  --card: #141f36;         /* card surface */
+  --card-edge: #26375c;    /* card borders */
+  --ink: #f1f5fb;          /* headings */
+  --body: #b6c2d6;         /* body text */
+  --muted: #8294ad;        /* captions, footer */
+  --amber: #f5a524;        /* the "warmth" accent */
+  --amber-soft: #ffd07a;
+  --urgent: #ef4457;
+  --track: #223252;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--night);
+  /* two soft glows: warm lamplight top-right, cold moonlight left */
+  background-image:
+    radial-gradient(900px 520px at 85% -10%, rgba(245, 165, 36, 0.16), transparent 60%),
+    radial-gradient(1100px 720px at -10% 0%, rgba(56, 108, 185, 0.22), transparent 55%);
+  background-repeat: no-repeat;
+  color: var(--body);
+  line-height: 1.55;
+  min-height: 100vh;
+}
+
+/* ===== Page layout ===== */
+
+.board {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 56px 22px 40px;
+}
+
+.board h1 {
+  color: var(--ink);
+  font-size: clamp(2.1rem, 4.5vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+/* a warm underline flourish beneath the title */
+.board h1::after {
+  content: "";
+  display: block;
+  width: 78px;
+  height: 5px;
+  margin-top: 12px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--amber), #ff7847);
+}
+
+.board-intro {
+  color: var(--body);
+  font-size: 1.06rem;
+  margin: 16px 0 34px;
+}
+
+.board-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 20px;
+}
+
+/* ===== Need cards ===== */
+
+.need-card {
+  background: linear-gradient(180deg, #17233d 0%, var(--card) 100%);
+  border: 1px solid var(--card-edge);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  box-shadow: 0 10px 30px rgba(3, 8, 20, 0.45);
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+  animation: card-in 0.5s ease backwards;
+}
+
+/* gentle stagger as the board loads */
+.need-card:nth-child(2) { animation-delay: 0.06s; }
+.need-card:nth-child(3) { animation-delay: 0.12s; }
+.need-card:nth-child(4) { animation-delay: 0.18s; }
+.need-card:nth-child(5) { animation-delay: 0.24s; }
+.need-card:nth-child(6) { animation-delay: 0.30s; }
+
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.need-card:hover {
+  transform: translateY(-4px);
+  border-color: #3b5588;
+  box-shadow: 0 18px 44px rgba(3, 8, 20, 0.6);
+}
+
+.need-card h2 {
+  color: var(--ink);
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.need-card > p {
+  font-size: 0.95rem;
+}
+
+/* urgent needs glow red at the edges */
+.need-card--urgent {
+  border-color: rgba(239, 68, 87, 0.55);
+  box-shadow:
+    0 10px 30px rgba(3, 8, 20, 0.45),
+    0 0 0 1px rgba(239, 68, 87, 0.22),
+    0 0 34px rgba(239, 68, 87, 0.12);
+}
+
+.need-card--urgent:hover {
+  border-color: rgba(239, 68, 87, 0.85);
+  box-shadow:
+    0 18px 44px rgba(3, 8, 20, 0.6),
+    0 0 0 1px rgba(239, 68, 87, 0.35),
+    0 0 44px rgba(239, 68, 87, 0.18);
+}
+
+/* ===== Badges ===== */
+
+.badge-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: #1c2b49;
+  border: 1px solid #31456d;
+  color: #b9c8e2;
+}
+
+/* the first badge is the category — it carries the warm accent */
+.badge-row .badge:first-child {
+  background: rgba(245, 165, 36, 0.14);
+  border-color: rgba(245, 165, 36, 0.40);
+  color: var(--amber-soft);
+}
+
+.badge--urgent {
+  background: linear-gradient(135deg, #f0455a, #d61f3e);
+  border-color: transparent;
+  color: #ffffff;
+  box-shadow: 0 3px 12px rgba(239, 68, 87, 0.35);
+}
+
+/* ===== Progress ===== */
+
+.progress-track {
+  height: 9px;
+  background: var(--track);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #1fb45c, #43e488);
+  box-shadow: 0 0 12px rgba(67, 228, 136, 0.35);
+  transition: width 0.5s ease;
+}
+
+.progress-caption {
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+/* ===== Details toggle ===== */
+
+.details-button {
+  align-self: flex-start;
+  border: 1px solid #35507f;
+  background: transparent;
+  color: #dbe6f5;
+  border-radius: 9px;
+  padding: 9px 16px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.details-button:hover {
+  background: rgba(245, 165, 36, 0.10);
+  border-color: rgba(245, 165, 36, 0.55);
+  color: var(--amber-soft);
+}
+
+/* keyboard users always see where they are */
+.details-button:focus-visible {
+  outline: 3px solid var(--amber);
+  outline-offset: 2px;
+}
+
+.need-details {
+  background: #0f1830;
+  border: 1px solid var(--card-edge);
+  border-left: 3px solid var(--amber);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 0.88rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  animation: details-in 0.22s ease;
+}
+
+@keyframes details-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.need-details strong {
+  color: var(--ink);
+}
+
+/* ===== Footer note ===== */
+
+.board-footer {
+  margin-top: 48px;
+  border-top: 1px solid var(--track);
+  padding-top: 20px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.board-footer a {
+  color: var(--amber-soft);
+  font-weight: 600;
+}
+
+/* ===== Small screens ===== */
+
+@media (max-width: 480px) {
+  .board {
+    padding: 36px 16px 32px;
+  }
+}
+
+/* ============================================================
+   Week Two additions — Contribution Flow
+   Header total, the pledge form, and the pledge list. Same
+   winter-night palette and class names as the lesson.
+   ============================================================ */
+
+/* ===== Header total ===== */
+
+.board-total {
+  margin-top: 14px;
+  display: inline-block;
+  font-size: 0.95rem;
+  color: var(--amber-soft);
+  background: rgba(245, 165, 36, 0.12);
+  border: 1px solid rgba(245, 165, 36, 0.40);
+  border-radius: 999px;
+  padding: 6px 16px;
+}
+
+.board-total strong {
+  color: var(--ink);
+  font-size: 1.05rem;
+}
+
+/* ===== Success confirmation banner ===== */
+
+.confirmation-banner {
+  margin: 20px 0 0;
+  background: rgba(67, 228, 136, 0.12);
+  border: 1px solid rgba(67, 228, 136, 0.40);
+  color: #7ff0ad;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  animation: details-in 0.25s ease;
+}
+
+/* ===== Contribution panel: form + pledge list, side by side ===== */
+
+.contribution-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin: 30px 0 34px;
+}
+
+.contribution-form,
+.pledge-list {
+  background: linear-gradient(180deg, #17233d 0%, var(--card) 100%);
+  border: 1px solid var(--card-edge);
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 10px 30px rgba(3, 8, 20, 0.45);
+}
+
+.contribution-form h2,
+.pledge-list h2 {
+  color: var(--ink);
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+/* ===== Form fields ===== */
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 15px;
+}
+
+.form-field label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--body);
+}
+
+.contribution-form select,
+.contribution-form input {
+  background: #0f1830;
+  border: 1px solid #35507f;
+  border-radius: 9px;
+  padding: 10px 12px;
+  color: var(--ink);
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.contribution-form select:focus-visible,
+.contribution-form input:focus-visible {
+  outline: 3px solid var(--amber);
+  outline-offset: 2px;
+}
+
+.field-error {
+  color: #ff9aa6;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* ===== Live summary (watch) ===== */
+
+.form-summary {
+  background: rgba(245, 165, 36, 0.10);
+  border: 1px solid rgba(245, 165, 36, 0.35);
+  border-radius: 10px;
+  padding: 10px 13px;
+  font-size: 0.9rem;
+  color: var(--amber-soft);
+  margin-bottom: 15px;
+  animation: details-in 0.2s ease;
+}
+
+.form-summary strong {
+  color: var(--ink);
+}
+
+/* ===== Submit button ===== */
+
+.pledge-button {
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: #201400;
+  background: linear-gradient(135deg, var(--amber), #ff7847);
+  box-shadow: 0 6px 18px rgba(245, 165, 36, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pledge-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(245, 165, 36, 0.42);
+}
+
+.pledge-button:focus-visible {
+  outline: 3px solid var(--amber-soft);
+  outline-offset: 2px;
+}
+
+/* ===== Pledge list ===== */
+
+.pledge-rows {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pledge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #0f1830;
+  border: 1px solid var(--card-edge);
+  border-left: 3px solid var(--amber);
+  border-radius: 10px;
+  padding: 10px 14px;
+  animation: details-in 0.2s ease;
+}
+
+.pledge-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.92rem;
+}
+
+.pledge-text strong {
+  color: var(--ink);
+}
+
+.pledge-meta {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.contribution-form select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pledge-cancel {
+  border: 1px solid #4a2130;
+  background: transparent;
+  color: #ffb3bf;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.pledge-cancel:hover {
+  background: rgba(239, 68, 87, 0.14);
+  border-color: rgba(239, 68, 87, 0.6);
+}
+
+.pledge-cancel:focus-visible {
+  outline: 3px solid var(--urgent);
+  outline-offset: 2px;
+}
+
+.empty-state {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.pledged-note {
+  color: var(--amber-soft);
+  font-weight: 600;
+}
+
+/* respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .need-card,
+  .need-details,
+  .progress-fill,
+  .details-button,
+  .form-summary,
+  .pledge-row,
+  .confirmation-banner {
+    animation: none;
+    transition: none;
+  }
+
+  .need-card:hover {
+    transform: none;
+  }
+
+  .pledge-button:hover {
+    transform: none;
+  }
+}
