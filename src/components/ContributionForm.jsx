@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
 // Where donors can drop items off (fictional community locations).
 const DROPOFF_LOCATIONS = [
@@ -10,17 +10,18 @@ const DROPOFF_LOCATIONS = [
   "Rochester Community Center",
 ];
 
-// Yup schema: one place that says what a valid pledge looks like.
-const pledgeSchema = yup.object({
-  needId: yup.string().required("Please choose an item"),
-  size: yup.string().required("Please choose a size"),
-  quantity: yup
-    .number()
-    .typeError("Enter a number")
-    .min(1, "At least 1")
-    .required("Enter a number"),
-  donorName: yup.string().trim().min(2, "Please enter your name").required("Please enter your name"),
-  dropoff: yup.string().required("Choose a drop-off location"),
+// Zod schema: one place that says what a valid pledge looks like.
+const pledgeSchema = z.object({
+  needId: z.string().min(1, "Please choose an item"),
+  size: z.string().min(1, "Please choose a size"),
+  quantity: z.preprocess(
+    (value) => (value === "" || value == null ? undefined : value),
+    z
+      .number({ required_error: "Enter a number", invalid_type_error: "Enter a number" })
+      .min(1, "At least 1")
+  ),
+  donorName: z.string().trim().min(2, "Please enter your name"),
+  dropoff: z.string().min(1, "Choose a drop-off location"),
 });
 
 function ContributionForm({ needs, onAddPledge }) {
@@ -31,8 +32,8 @@ function ContributionForm({ needs, onAddPledge }) {
     reset,
     formState: { errors },
   } = useForm({
-    // Yup does the validating; RHF does the wiring.
-    resolver: yupResolver(pledgeSchema),
+    // Zod does the validating; RHF does the wiring.
+    resolver: zodResolver(pledgeSchema),
     defaultValues: { needId: "", size: "", quantity: "", donorName: "", dropoff: "" },
   });
 
@@ -50,7 +51,7 @@ function ContributionForm({ needs, onAddPledge }) {
     return match ? match.name : "";
   }
 
-  // handleSubmit runs Yup first; onValid only fires if everything passes.
+  // handleSubmit runs Zod first; onValid only fires if everything passes.
   function onValid(data) {
     onAddPledge({ id: crypto.randomUUID(), ...data });
     reset();
