@@ -15,10 +15,17 @@ const pledgeSchema = z.object({
   needId: z.string().min(1, "Please choose an item"),
   size: z.string().min(1, "Please choose a size"),
   quantity: z.preprocess(
-    (value) => (value === "" || value == null ? undefined : value),
+    (value) => {
+      if (typeof value === "number" && Number.isNaN(value)) return undefined;
+      if (typeof value === "string" && value.trim() === "") return undefined;
+      return value;
+    },
     z
-      .number({ required_error: "Enter a number", invalid_type_error: "Enter a number" })
-      .min(1, "At least 1")
+      .number({
+        required_error: "Enter a number",
+        invalid_type_error: "Enter a number",
+      })
+      .min(1, "At least 1"),
   ),
   donorName: z.string().trim().min(2, "Please enter your name"),
   dropoff: z.string().min(1, "Choose a drop-off location"),
@@ -34,7 +41,13 @@ function ContributionForm({ needs, onAddPledge }) {
   } = useForm({
     // Zod does the validating; RHF does the wiring.
     resolver: zodResolver(pledgeSchema),
-    defaultValues: { needId: "", size: "", quantity: "", donorName: "", dropoff: "" },
+    defaultValues: {
+      needId: "",
+      size: "",
+      quantity: "",
+      donorName: "",
+      dropoff: "",
+    },
   });
 
   // Live reads for the summary and the dependent size list.
@@ -63,8 +76,17 @@ function ContributionForm({ needs, onAddPledge }) {
 
       <div className="form-field">
         <label htmlFor="donorName">Your name</label>
-        <input id="donorName" type="text" placeholder="e.g. Amina" {...register("donorName")} />
-        {errors.donorName && <p className="field-error" role="alert">{errors.donorName.message}</p>}
+        <input
+          id="donorName"
+          type="text"
+          placeholder="e.g. Amina"
+          {...register("donorName")}
+        />
+        {errors.donorName && (
+          <p className="field-error" role="alert">
+            {errors.donorName.message}
+          </p>
+        )}
       </div>
 
       <div className="form-field">
@@ -72,28 +94,52 @@ function ContributionForm({ needs, onAddPledge }) {
         <select id="needId" {...register("needId")}>
           <option value="">Choose an item…</option>
           {needs.map((need) => (
-            <option key={need.id} value={need.id}>{need.name}</option>
+            <option key={need.id} value={need.id}>
+              {need.name}
+            </option>
           ))}
         </select>
-        {errors.needId && <p className="field-error" role="alert">{errors.needId.message}</p>}
+        {errors.needId && (
+          <p className="field-error" role="alert">
+            {errors.needId.message}
+          </p>
+        )}
       </div>
 
       <div className="form-field">
         <label htmlFor="size">Size</label>
         {/* Options come from the selected item; disabled until one is picked. */}
         <select id="size" disabled={!selectedNeed} {...register("size")}>
-          <option value="">{selectedNeed ? "Choose a size…" : "Pick an item first"}</option>
+          <option value="">
+            {selectedNeed ? "Choose a size…" : "Pick an item first"}
+          </option>
           {sizeOptions.map((s) => (
-            <option key={s} value={s}>{s}</option>
+            <option key={s} value={s}>
+              {s}
+            </option>
           ))}
         </select>
-        {errors.size && <p className="field-error" role="alert">{errors.size.message}</p>}
+        {errors.size && (
+          <p className="field-error" role="alert">
+            {errors.size.message}
+          </p>
+        )}
       </div>
 
       <div className="form-field">
         <label htmlFor="quantity">How many?</label>
-        <input id="quantity" type="number" inputMode="numeric" placeholder="e.g. 5" {...register("quantity")} />
-        {errors.quantity && <p className="field-error" role="alert">{errors.quantity.message}</p>}
+        <input
+          id="quantity"
+          type="number"
+          inputMode="numeric"
+          placeholder="e.g. 5"
+          {...register("quantity", { valueAsNumber: true })}
+        />
+        {errors.quantity && (
+          <p className="field-error" role="alert">
+            {errors.quantity.message}
+          </p>
+        )}
       </div>
 
       <div className="form-field">
@@ -101,10 +147,16 @@ function ContributionForm({ needs, onAddPledge }) {
         <select id="dropoff" {...register("dropoff")}>
           <option value="">Choose a location…</option>
           {DROPOFF_LOCATIONS.map((loc) => (
-            <option key={loc} value={loc}>{loc}</option>
+            <option key={loc} value={loc}>
+              {loc}
+            </option>
           ))}
         </select>
-        {errors.dropoff && <p className="field-error" role="alert">{errors.dropoff.message}</p>}
+        {errors.dropoff && (
+          <p className="field-error" role="alert">
+            {errors.dropoff.message}
+          </p>
+        )}
       </div>
 
       {/* Live summary via watch(): updates on every keystroke. */}
@@ -115,7 +167,9 @@ function ContributionForm({ needs, onAddPledge }) {
         </p>
       )}
 
-      <button type="submit" className="pledge-button">Add pledge</button>
+      <button type="submit" className="pledge-button">
+        Add pledge
+      </button>
     </form>
   );
 }
